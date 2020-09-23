@@ -1,6 +1,8 @@
+import 'dart:async';
 import 'dart:convert';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_api_rest/api/my_api.dart';
 import 'package:flutter_api_rest/pages/login-page.dart';
 import 'package:flutter_api_rest/utils/session.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
@@ -13,7 +15,14 @@ class Auth {
   final _storage = FlutterSecureStorage();
   final key = "SESSION";
 
+  Completer _completer;
+
   Future<String> get accessToken async {
+    if (_completer != null) {
+      await _completer.future;
+    }
+    _completer = Completer();
+
     final Session session = await this.getSession();
     if (session != null) {
       final DateTime currentDate = DateTime.now();
@@ -22,12 +31,21 @@ class Auth {
       final int differenceInSeconds =
           currentDate.difference(createdAt).inSeconds;
       if (expiresIn - differenceInSeconds >= 60) {
+        _completer.complete();
         return session.token;
       } else {
-        print("Refresh token");
+        MyAPI myApi = MyAPI();
+        final Map<String, dynamic> data = await myApi.refresh(session.token);
+        if (data != null) {
+          await this.setSession(data);
+          _completer.complete();
+          return data['token'];
+        }
+        _completer.complete();
         return null;
       }
     }
+    _completer.complete();
     return null;
   }
 
