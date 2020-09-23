@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_api_rest/api/my_api.dart';
 import 'package:flutter_api_rest/utils/responsive.dart';
 import 'package:flutter_api_rest/widgets/input-text.dart';
 
@@ -16,8 +17,8 @@ class _LoginFormState extends State<LoginForm> {
   _submit() {
     final bool formLoginIsValid = _formKey.currentState.validate();
     if (formLoginIsValid) {
-      print(this._email);
-      print(this._password);
+      MyAPI myApi = MyAPI();
+      myApi.login(context, email: _email, password: _password);
     }
   }
 
