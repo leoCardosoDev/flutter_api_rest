@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_api_rest/api/my_api.dart';
 import 'package:flutter_api_rest/utils/responsive.dart';
 import 'package:flutter_api_rest/widgets/input-text.dart';
 
@@ -13,12 +14,16 @@ class _RegisterFormState extends State<RegisterForm> {
   GlobalKey<FormState> _formKey = GlobalKey();
   String _email = "", _password = "", _username = "";
 
-  _submit() {
+  _submit() async {
     final bool formLoginIsValid = _formKey.currentState.validate();
     if (formLoginIsValid) {
-      print(this._email);
-      print(this._password);
-      print(this._username);
+      MyAPI myApi = new MyAPI();
+      await myApi.register(
+        context,
+        username: _username,
+        email: _email,
+        password: _password,
+      );
     }
   }
 
@@ -70,6 +75,7 @@ class _RegisterFormState extends State<RegisterForm> {
                     responsive.diagonalPercent(responsive.isTablet ? 2.1 : 2.3),
                 keyBoardType: TextInputType.emailAddress,
                 label: "Password",
+                obscureText: true,
                 onChanged: (text) {
                   this._password = text;
                 },
