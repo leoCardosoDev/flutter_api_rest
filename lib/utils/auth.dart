@@ -1,5 +1,7 @@
 import 'dart:convert';
 
+import 'package:flutter/material.dart';
+import 'package:flutter_api_rest/pages/login-page.dart';
 import 'package:flutter_api_rest/utils/session.dart';
 import 'package:flutter_secure_storage/flutter_secure_storage.dart';
 
@@ -11,7 +13,31 @@ class Auth {
   final _storage = FlutterSecureStorage();
   final key = "SESSION";
 
-  Future<void> setSession(Session session) async {
+  Future<String> get accessToken async {
+    final Session session = await this.getSession();
+    if (session != null) {
+      final DateTime currentDate = DateTime.now();
+      final DateTime createdAt = session.createdAt;
+      final int expiresIn = session.expiresIn;
+      final int differenceInSeconds =
+          currentDate.difference(createdAt).inSeconds;
+      if (expiresIn - differenceInSeconds >= 60) {
+        return session.token;
+      } else {
+        print("Refresh token");
+        return null;
+      }
+    }
+    return null;
+  }
+
+  Future<void> setSession(Map<String, dynamic> data) async {
+    final session = Session(
+      token: data['token'],
+      expiresIn: data['expiresIn'],
+      createdAt: DateTime.now(),
+    );
+
     final String value = jsonEncode(session.toJson());
     await this._storage.write(key: key, value: value);
   }
@@ -24,5 +50,14 @@ class Auth {
       return session;
     }
     return null;
+  }
+
+  Future<void> logOut(BuildContext context) async {
+    await this._storage.deleteAll();
+    Navigator.pushNamedAndRemoveUntil(
+      context,
+      LoginPage.routeName,
+      (_) => false,
+    );
   }
 }

@@ -1,6 +1,7 @@
 import 'package:dio/dio.dart';
 import 'package:flutter/material.dart';
 import 'package:flutter_api_rest/pages/home-page.dart';
+import 'package:flutter_api_rest/utils/auth.dart';
 import 'package:flutter_api_rest/utils/dialogs.dart';
 import 'package:meta/meta.dart';
 
@@ -17,11 +18,12 @@ class MyAPI {
     final ProgressDialog progressDialog = ProgressDialog(context);
     try {
       progressDialog.show();
-      await this._dio.post('/api/v1/register', data: {
+      final Response response = await this._dio.post('/api/v1/register', data: {
         "username": username,
         "email": email,
         "password": password,
       });
+      await Auth.instance.setSession(response.data);
       progressDialog.dismiss();
       Navigator.pushNamedAndRemoveUntil(
           context, HomePage.routeName, (_) => false);
@@ -47,10 +49,11 @@ class MyAPI {
     final ProgressDialog progressDialog = ProgressDialog(context);
     try {
       progressDialog.show();
-      await this._dio.post('/api/v1/login', data: {
+      final Response response = await this._dio.post('/api/v1/login', data: {
         "email": email,
         "password": password,
       });
+      await Auth.instance.setSession(response.data);
       progressDialog.dismiss();
       Navigator.pushNamedAndRemoveUntil(
           context, HomePage.routeName, (_) => false);

@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter_api_rest/utils/auth.dart';
 
 class HomePage extends StatefulWidget {
   static const routeName = 'home';
@@ -9,9 +10,12 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   @override
   Widget build(BuildContext context) {
-    return Center(
-      child: Container(
-        child: Text('HOME'),
+    return Scaffold(
+      body: Center(
+        child: FlatButton(
+          onPressed: () => Auth.instance.logOut(context),
+          child: Text('Log Out'),
+        ),
       ),
     );
   }
