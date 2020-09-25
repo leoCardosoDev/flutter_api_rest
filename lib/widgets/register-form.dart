@@ -17,8 +17,7 @@ class _RegisterFormState extends State<RegisterForm> {
   _submit() async {
     final bool formLoginIsValid = _formKey.currentState.validate();
     if (formLoginIsValid) {
-      MyAPI myApi = new MyAPI();
-      await myApi.register(
+      await MyAPI.instance.register(
         context,
         username: _username,
         email: _email,

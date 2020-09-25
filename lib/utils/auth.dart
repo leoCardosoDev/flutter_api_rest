@@ -31,22 +31,28 @@ class Auth {
       final int differenceInSeconds =
           currentDate.difference(createdAt).inSeconds;
       if (expiresIn - differenceInSeconds >= 60) {
-        _completer.complete();
+        _complete();
         return session.token;
       } else {
-        MyAPI myApi = MyAPI();
-        final Map<String, dynamic> data = await myApi.refresh(session.token);
+        final Map<String, dynamic> data =
+            await MyAPI.instance.refresh(session.token);
         if (data != null) {
           await this.setSession(data);
-          _completer.complete();
+          _complete();
           return data['token'];
         }
-        _completer.complete();
+        _complete();
         return null;
       }
     }
-    _completer.complete();
+    _complete();
     return null;
+  }
+
+  _complete() {
+    if (this._completer != null && !this._completer.isCompleted) {
+      this._completer.complete();
+    }
   }
 
   Future<void> setSession(Map<String, dynamic> data) async {
